@@ -1,0 +1,3 @@
+#ifndef GSV2K6_RXLN_MAP_FCT_H
+#define GSV2K6_RXLN_MAP_FCT_H
+#endif

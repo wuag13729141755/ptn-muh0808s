@@ -1,0 +1,32 @@
+#ifndef MS1826_API_H
+#define MS1826_API_H
+#include "includes.h"
+
+#include "ms_typedef.h"
+#include "api_4ksdn.h"
+#include "api_csc.h"
+#include "api_deint.h"
+#include "api_dma_common.h"
+#include "api_dmc.h"
+#include "api_dsc.h"
+#include "api_hdmi_rx.h"
+#include "api_hdmi_tx.h"
+#include "api_i2c2sdram.h"
+#include "api_misc.h"
+#include "api_osd.h"
+#include "api_pll.h"
+#include "api_sdn.h"
+#include "api_split.h"
+#include "api_su.h"
+#include "api_sysram.h"
+#include "api_vds_timgen.h"
+#include "api_vehc.h"
+#include "api_video_mixer.h"
+#include "api_video_path_process.h"
+#include "api_vrdma.h"
+#include "api_vwdma.h"
+#include "ms_hdmi.h"
+#include "ms1826_comm.h"
+#include "ms1826_timing_table.h"
+
+#endif

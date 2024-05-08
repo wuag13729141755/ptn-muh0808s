@@ -1,0 +1,3 @@
+#ifndef GSV2K8_RXSCDC_MAP_FCT_H
+#define GSV2K8_RXSCDC_MAP_FCT_H
+#endif

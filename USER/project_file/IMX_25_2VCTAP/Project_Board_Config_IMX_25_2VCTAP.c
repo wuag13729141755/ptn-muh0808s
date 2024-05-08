@@ -1,0 +1,803 @@
+#include "includes.h"
+
+#define DELAY_TIME_FOR_SPI_FLASH_BYTE      5
+#define DELAY_TIME_FOR_SPI_FLASH_CLK       3
+
+const stGpioConfig_t stProjectGpioTable[eGpioName_Max]=
+{
+    //eGpioName_LedSta,
+    {PORT_GPIOE,       GPIO_Pin_11,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_Led1_D7,
+    {PORT_GPIOB,        GPIO_Pin_0,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_Led2_D8,
+    {PORT_GPIOB,        GPIO_Pin_1,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_Led3_D9,
+    {PORT_GPIOB,       GPIO_Pin_14,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_Led4_D10,
+    {PORT_GPIOB,       GPIO_Pin_15,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_LedSwitch_D11,
+    {PORT_GPIOB,        GPIO_Pin_3,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_LedCall_D12,
+    {PORT_GPIOB,        GPIO_Pin_4,   GPIO_Mode_OUT, GPIO_OType_PP,     GPIO_PuPd_UP,   ePinLevel_High},
+    //eGpioName_LedS1_R,
+    {PORT_TM1623_GRID1_L(0),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS1_G,
+    {PORT_TM1623_GRID2_L(0),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS1_B,
+    {PORT_TM1623_GRID3_L(0),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS2_R,
+    {PORT_TM1623_GRID4_L(0),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS2_G,
+    {PORT_TM1623_GRID5_L(0),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS2_B,
+    {PORT_TM1623_GRID6_L(0),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS3_R,
+    {PORT_TM1623_GRID1_L(0),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS3_G,
+    {PORT_TM1623_GRID2_L(0),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS3_B,
+    {PORT_TM1623_GRID3_L(0),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS4_R,
+    {PORT_TM1623_GRID1_L(0),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS4_G,
+    {PORT_TM1623_GRID2_L(0),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS4_B,
+    {PORT_TM1623_GRID3_L(0),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS5_R,
+    {PORT_TM1623_GRID4_L(0),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS5_G,
+    {PORT_TM1623_GRID5_L(0),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS5_B,
+    {PORT_TM1623_GRID6_L(0),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS6_R,
+    {PORT_TM1623_GRID4_L(0),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS6_G,
+    {PORT_TM1623_GRID5_L(0),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS6_B,
+    {PORT_TM1623_GRID6_L(0),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS7_R,
+    {PORT_TM1623_GRID1_L(0),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS7_G,
+    {PORT_TM1623_GRID2_L(0),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS7_B,
+    {PORT_TM1623_GRID3_L(0),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS8_R,
+    {PORT_TM1623_GRID4_L(0),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS8_G,
+    {PORT_TM1623_GRID5_L(0),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS8_B,
+    {PORT_TM1623_GRID6_L(0),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS9_R,
+    {PORT_TM1623_GRID1_H(0),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS9_G,
+    {PORT_TM1623_GRID2_H(0),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS9_B,
+    {PORT_TM1623_GRID3_H(0),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS10_R,
+    {PORT_TM1623_GRID1_L(0),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS10_G,
+    {PORT_TM1623_GRID2_L(0),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS10_B,
+    {PORT_TM1623_GRID3_L(0),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS11_R,
+    {PORT_TM1623_GRID4_L(0),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS11_G,
+    {PORT_TM1623_GRID5_L(0),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS11_B,
+    {PORT_TM1623_GRID6_L(0),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS12_R,
+    {PORT_TM1623_GRID4_H(0),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS12_G,
+    {PORT_TM1623_GRID5_H(0),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS12_B,
+    {PORT_TM1623_GRID6_H(0),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS13_R,
+    {PORT_TM1623_GRID1_L(0),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS13_G,
+    {PORT_TM1623_GRID2_L(0),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS13_B,
+    {PORT_TM1623_GRID3_L(0),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS14_R,
+    {PORT_TM1623_GRID4_L(0),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS14_G,
+    {PORT_TM1623_GRID5_L(0),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS14_B,
+    {PORT_TM1623_GRID6_L(0),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS15_R,
+    {PORT_TM1623_GRID1_H(0), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS15_G,
+    {PORT_TM1623_GRID2_H(0), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS15_B,
+    {PORT_TM1623_GRID3_H(0), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS16_R,
+    {PORT_TM1623_GRID1_L(0),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS16_G,
+    {PORT_TM1623_GRID2_L(0),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS16_B,
+    {PORT_TM1623_GRID3_L(0),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS17_R,
+    {PORT_TM1623_GRID4_L(0),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS17_G,
+    {PORT_TM1623_GRID5_L(0),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS17_B,
+    {PORT_TM1623_GRID6_L(0),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS18_R,
+    {PORT_TM1623_GRID4_H(0), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS18_G,
+    {PORT_TM1623_GRID5_H(0), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS18_B,
+    {PORT_TM1623_GRID6_H(0), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS19_R,
+    {PORT_TM1623_GRID1_L(0),  SEG7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS19_G,
+    {PORT_TM1623_GRID2_L(0),  SEG7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS19_B,
+    {PORT_TM1623_GRID3_L(0),  SEG7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS20_R,
+    {PORT_TM1623_GRID1_L(1),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS20_G,
+    {PORT_TM1623_GRID2_L(1),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS20_B,
+    {PORT_TM1623_GRID3_L(1),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS21_R,
+    {PORT_TM1623_GRID4_L(1),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS21_G,
+    {PORT_TM1623_GRID5_L(1),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS21_B,
+    {PORT_TM1623_GRID6_L(1),  SEG1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS22_R,
+    {PORT_TM1623_GRID1_L(1),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS22_G,
+    {PORT_TM1623_GRID2_L(1),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS22_B,
+    {PORT_TM1623_GRID3_L(1),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS23_R,
+    {PORT_TM1623_GRID1_L(1),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS23_G,
+    {PORT_TM1623_GRID2_L(1),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS23_B,
+    {PORT_TM1623_GRID3_L(1),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS24_R,
+    {PORT_TM1623_GRID4_L(1),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS24_G,
+    {PORT_TM1623_GRID5_L(1),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS24_B,
+    {PORT_TM1623_GRID6_L(1),  SEG2,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS25_R,
+    {PORT_TM1623_GRID4_L(1),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS25_G,
+    {PORT_TM1623_GRID5_L(1),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS25_B,
+    {PORT_TM1623_GRID6_L(1),  SEG8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS26_R,
+    {PORT_TM1623_GRID1_L(1),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS26_G,
+    {PORT_TM1623_GRID2_L(1),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS26_B,
+    {PORT_TM1623_GRID3_L(1),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS27_R,
+    {PORT_TM1623_GRID4_L(1),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS27_G,
+    {PORT_TM1623_GRID5_L(1),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS27_B,
+    {PORT_TM1623_GRID6_L(1),  SEG3,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS28_R,
+    {PORT_TM1623_GRID1_H(1),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS28_G,
+    {PORT_TM1623_GRID2_H(1),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS28_B,
+    {PORT_TM1623_GRID3_H(1),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS29_R,
+    {PORT_TM1623_GRID1_L(1),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS29_G,
+    {PORT_TM1623_GRID2_L(1),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS29_B,
+    {PORT_TM1623_GRID3_L(1),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS30_R,
+    {PORT_TM1623_GRID4_L(1),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS30_G,
+    {PORT_TM1623_GRID5_L(1),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS30_B,
+    {PORT_TM1623_GRID6_L(1),  SEG4,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS31_R,
+    {PORT_TM1623_GRID4_H(1),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS31_G,
+    {PORT_TM1623_GRID5_H(1),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS31_B,
+    {PORT_TM1623_GRID6_H(1),  SEG9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS32_R,
+    {PORT_TM1623_GRID1_L(1),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS32_G,
+    {PORT_TM1623_GRID2_L(1),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS32_B,
+    {PORT_TM1623_GRID3_L(1),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS33_R,
+    {PORT_TM1623_GRID4_L(1),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS33_G,
+    {PORT_TM1623_GRID5_L(1),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS33_B,
+    {PORT_TM1623_GRID6_L(1),  SEG5,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS34_R,
+    {PORT_TM1623_GRID1_H(1), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS34_G,
+    {PORT_TM1623_GRID2_H(1), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS34_B,
+    {PORT_TM1623_GRID3_H(1), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS35_R,
+    {PORT_TM1623_GRID1_L(1),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS35_G,
+    {PORT_TM1623_GRID2_L(1),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS35_B,
+    {PORT_TM1623_GRID3_L(1),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS36_R,
+    {PORT_TM1623_GRID4_L(1),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS36_G,
+    {PORT_TM1623_GRID5_L(1),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS36_B,
+    {PORT_TM1623_GRID6_L(1),  SEG6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS37_R,
+    {PORT_TM1623_GRID4_H(1), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS37_G,
+    {PORT_TM1623_GRID5_H(1), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS37_B,
+    {PORT_TM1623_GRID6_H(1), SEG10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS38_R,
+    {PORT_TM1623_GRID1_L(1),  SEG7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS38_G,
+    {PORT_TM1623_GRID2_L(1),  SEG7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_LedS38_B,
+    {PORT_TM1623_GRID3_L(1),  SEG7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+
+    // key
+    //eGpioName_KeyS1,
+    {PORT_TM1623_KVAL_0(0),  KS1_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS2,
+    {PORT_TM1623_KVAL_0(0),  KS1_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS3,
+    {PORT_TM1623_KVAL_0(0),  KS1_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS4,
+    {PORT_TM1623_KVAL_0(0),  KS2_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS5,
+    {PORT_TM1623_KVAL_0(0),  KS2_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS6,
+    {PORT_TM1623_KVAL_0(0),  KS2_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS7,
+    {PORT_TM1623_KVAL_1(0),  KS3_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS8,
+    {PORT_TM1623_KVAL_1(0),  KS3_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS9,
+    {PORT_TM1623_KVAL_1(0),  KS3_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS10,
+    {PORT_TM1623_KVAL_1(0),  KS4_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS11,
+    {PORT_TM1623_KVAL_1(0),  KS4_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS12,
+    {PORT_TM1623_KVAL_1(0),  KS4_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS13,
+    {PORT_TM1623_KVAL_2(0),  KS5_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS14,
+    {PORT_TM1623_KVAL_2(0),  KS5_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS15,
+    {PORT_TM1623_KVAL_2(0),  KS5_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS16,
+    {PORT_TM1623_KVAL_2(0),  KS6_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS17,
+    {PORT_TM1623_KVAL_2(0),  KS6_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS18,
+    {PORT_TM1623_KVAL_2(0),  KS6_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS19,
+    {PORT_TM1623_KVAL_3(0),  KS7_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS20,
+    {PORT_TM1623_KVAL_0(1),  KS1_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS21,
+    {PORT_TM1623_KVAL_0(1),  KS1_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS22,
+    {PORT_TM1623_KVAL_0(1),  KS1_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS23,
+    {PORT_TM1623_KVAL_0(1),  KS2_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS24,
+    {PORT_TM1623_KVAL_0(1),  KS2_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS25,
+    {PORT_TM1623_KVAL_0(1),  KS2_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS26,
+    {PORT_TM1623_KVAL_1(1),  KS3_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS27,
+    {PORT_TM1623_KVAL_1(1),  KS3_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS28,
+    {PORT_TM1623_KVAL_1(1),  KS3_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS29,
+    {PORT_TM1623_KVAL_1(1),  KS4_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS30,
+    {PORT_TM1623_KVAL_1(1),  KS4_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS31,
+    {PORT_TM1623_KVAL_1(1),  KS4_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS32,
+    {PORT_TM1623_KVAL_2(1),  KS5_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS33,
+    {PORT_TM1623_KVAL_2(1),  KS5_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS34,
+    {PORT_TM1623_KVAL_2(1),  KS5_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS35,
+    {PORT_TM1623_KVAL_2(1),  KS6_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS36,
+    {PORT_TM1623_KVAL_2(1),  KS6_K2,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS37,
+    {PORT_TM1623_KVAL_2(1),  KS6_K3,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_KeyS38,
+    {PORT_TM1623_KVAL_3(1),  KS7_K1,   GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+
+    //i2c
+    //eGpioName_I2cEepromScl
+    {PORT_GPIOB,        GPIO_Pin_8,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_I2cEepromSda
+    {PORT_GPIOB,        GPIO_Pin_9,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_I2cAlpuScl,
+    {PORT_GPIOB,        GPIO_Pin_7,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_I2cAlpuSda,
+    {PORT_GPIOB,        GPIO_Pin_6,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+
+    //Spi
+    //eGpioName_SpiTm1623Clk1,
+    {PORT_GPIOD,       GPIO_Pin_11,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiTm1623Cs1,
+    {PORT_GPIOD,       GPIO_Pin_12,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiTm1623Dio1,
+    {PORT_GPIOD,       GPIO_Pin_10,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiTm1623Clk2,
+    {PORT_GPIOD,       GPIO_Pin_14,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiTm1623Cs2,
+    {PORT_GPIOD,       GPIO_Pin_15,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiTm1623Dio2,
+    {PORT_GPIOD,       GPIO_Pin_13,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiW5500Clk,
+    {PORT_GPIOE,        GPIO_Pin_0,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiW5500Cs,
+    {PORT_GPIOE,        GPIO_Pin_1,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiW5500Mosi,
+    {PORT_GPIOE,       GPIO_Pin_14,   GPIO_Mode_OUT, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    //eGpioName_SpiW5500Miso,
+    {PORT_GPIOE,       GPIO_Pin_15,    GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+
+    // reset
+    //eGpioName_W5500Rst,
+    {PORT_GPIOE,       GPIO_Pin_12,   GPIO_Mode_OUT, GPIO_OType_PP, GPIO_PuPd_NOPULL,   ePinLevel_High},
+    // ect
+    //eGpioName_W5500Int,
+    {PORT_GPIOE,       GPIO_Pin_13,    GPIO_Mode_IN, GPIO_OType_OD, GPIO_PuPd_NOPULL,   ePinLevel_High},
+};
+
+#if _ENABLE_NEW_USER_KEY_DEFINE_FUNCTION
+const stKeyDeclare_t stProjectKeyTable[] =
+{
+    //key null
+    {{NULL, \
+    NULL, \
+    NULL, \
+    NULL}, \
+    key_detect_mode_after, \
+    KEY_LONG_INVALID, \
+    {KEY_REPEAT_INVALID, KEY_REPEAT_START_DELAY_NONE}, \
+    {{{NULL}, KEY_FILTER_TIME}},\
+    NULL, \
+    IR_REMOTE_KEY_INVALID, \
+    NULL}
+};
+#else
+const stKeyDeclare_t stProjectKeyTable[] =
+{
+    //key null
+    {{NULL, \
+    NULL, \
+    NULL, \
+    NULL}, \
+    key_detect_mode_after, \
+    KEY_LONG_INVALID, \
+    {KEY_REPEAT_INVALID, KEY_REPEAT_START_DELAY_NONE}, \
+    {{{NULL}, KEY_FILTER_TIME}},\
+    NULL, \
+    IR_REMOTE_KEY_INVALID, \
+    NULL}
+};
+#endif
+
+
+const stLedDeclare_t stProjectLedTable[] =
+{
+    //led_name_ActiveState = 0,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedSta],           ePinLevel_Low},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_Led1_D7],          ePinLevel_Low},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_Led2_D8],          ePinLevel_Low},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_Led3_D9],          ePinLevel_Low},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_Led4_D10],         ePinLevel_Low},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedSwitch_D11],    ePinLevel_Low},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedCall_D12],      ePinLevel_Low},
+
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS1_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS1_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS1_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS4_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS4_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS4_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS7_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS7_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS7_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS10_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS10_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS10_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS13_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS13_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS13_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS16_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS16_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS16_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS19_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS19_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS19_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS3_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS3_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS3_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS9_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS9_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS9_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS15_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS15_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS15_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS2_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS2_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS2_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS5_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS5_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS5_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS8_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS8_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS8_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS11_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS11_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS11_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS14_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS14_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS14_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS17_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS17_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS17_B],        ePinLevel_High},
+
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS20_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS20_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS20_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS23_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS23_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS23_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS26_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS26_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS26_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS29_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS29_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS29_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS32_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS32_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS32_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS35_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS35_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS35_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS38_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS38_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS38_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS22_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS22_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS22_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS28_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS28_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS28_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS34_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS34_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS34_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS21_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS21_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS21_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS24_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS24_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS24_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS27_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS27_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS27_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS30_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS30_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS30_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS33_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS33_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS33_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS36_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS36_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS36_B],        ePinLevel_High},
+
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS6_R],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS6_G],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS6_B],         ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS25_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS25_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS25_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS12_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS12_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS12_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS31_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS31_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS31_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS18_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS18_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS18_B],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS37_R],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS37_G],        ePinLevel_High},
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_LedS37_B],        ePinLevel_High},
+
+    //led_name_End
+    {(pstGpioConfig_t)NULL,                                                 ePinLevel_Low},// the last one
+};
+
+const stI2cDeclare_t stProjectI2cTable[] =
+{
+    //eeprom
+    {   (pstGpioConfig_t)&stProjectGpioTable[eGpioName_I2cEepromScl],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_I2cEepromSda],
+        I2C_SPEED_TIME_FOR_75K,
+        0,
+        0,
+        },
+
+#if 0
+    {   (pstGpioConfig_t)&stProjectGpioTable[eGpioName_I2cADN4604Scl],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_I2cADN4604Sda],
+        I2C_SPEED_TIME_FOR_100K,
+        0,
+        0,
+        },
+#endif
+
+    //i2c null
+    {   NULL,
+        NULL,
+        0,
+        0,
+        0,
+        },
+};
+
+const stSpiDeclare_t stProjectSpiTable[] =
+{
+    //tm1623 1
+    {   (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiTm1623Dio1],
+        NULL,
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiTm1623Clk1],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiTm1623Cs1],
+        DELAY_TIME_FOR_SPI_FLASH_BYTE,
+        DELAY_TIME_FOR_SPI_FLASH_CLK,
+        0,
+        },
+    //tm1623 2
+    {   (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiTm1623Dio2],
+        NULL,
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiTm1623Clk2],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiTm1623Cs2],
+        DELAY_TIME_FOR_SPI_FLASH_BYTE,
+        DELAY_TIME_FOR_SPI_FLASH_CLK,
+        0,
+        },
+    // w5500
+    {   (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiW5500Mosi],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiW5500Miso],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiW5500Clk],
+        (pstGpioConfig_t)&stProjectGpioTable[eGpioName_SpiW5500Cs],
+        DELAY_TIME_FOR_SPI_FLASH_BYTE,
+        DELAY_TIME_FOR_SPI_FLASH_CLK,
+        0,
+        },
+
+    //spi null
+    {NULL,                                                          NULL,\
+     NULL,                                                          NULL,\
+     100,                                                           100   },
+};
+
+const stRxHpdDetDeclare_t stProjectRxHpdDetTable[] =
+{
+    //hdmi input hpd null
+    {NULL},
+};
+
+const stIT663xxRstDeclare_t stProjectIT663xxRstTable[] =
+{
+    {NULL,                                                      ePinLevel_High},
+};
+
+const stIrWorkDeclare_t stProjectIrWorkTable =
+{
+    //{(pstGpioConfig_t)&stProjectGpioTable[eGpioName_IrSensor], eIrRmProtocol_NEC},
+    {NULL, eIrRmProtocol_None},
+    NULL,
+};
+
+const st5VControl_t stProjectTx5VControlTable[] =
+{
+    //hdmi output 5v null
+    {NULL},
+};
+
+const stUartDeclare_t stProjectUartWorkTable[] =
+{
+#if (_ENABLE_UART_1 == _MACRO_ENABLE)
+    //uart port 1   --- NOTUSE
+    {   _UART_PORT_1,
+        {115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None}, \
+        FALSE,
+        Uart1ProtocalDataReceive,
+        Uart1ParserMethod,
+        Uart1VarInit,
+        Uart1VarTimeOut},
+#endif
+#if (_ENABLE_UART_2 == _MACRO_ENABLE)
+    //uart port 2   --- to debug
+    {   _UART_PORT_2_PD5_6,
+        {115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None},
+        TRUE,//FALSE,
+        Uart2ProtocalDataReceive,
+        Uart2ParserMethod,
+        Uart2VarInit,
+        Uart2VarTimeOut},
+#endif
+#if (_ENABLE_UART_3 == _MACRO_ENABLE)
+    //uart port 3   --- NOTUSE
+    {   _UART_PORT_3_PD8_9,
+        {9600, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None},
+        FALSE,//TRUE,
+        Uart3ProtocalDataReceive,
+        Uart3ParserMethod,
+        Uart3VarInit,
+        Uart3VarTimeOut},
+#endif
+#if (_ENABLE_UART_4 == _MACRO_ENABLE)
+    //uart port 4   --- to main board
+    {   _UART_PORT_4,
+        {115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None},
+        FALSE,//TRUE,
+        Uart4ProtocalDataReceive,
+        Uart4ParserMethod,
+        Uart4VarInit,
+        Uart4VarTimeOut},
+#endif
+#if (_ENABLE_UART_5 == _MACRO_ENABLE)
+    //uart port 5
+    {   _UART_PORT_5,
+        {115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None},
+        FALSE,
+        Uart5ProtocalDataReceive,
+        Uart5ParserMethod,
+        Uart5VarInit,
+        Uart5VarTimeOut},
+#endif
+#if (_ENABLE_UART_6 == _MACRO_ENABLE)
+    //uart port 6   --- NOTUSE
+    {   _UART_PORT_6,
+        {9600, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None},
+        FALSE,//TRUE,
+        Uart6ProtocalDataReceive,
+        Uart6ParserMethod,
+        Uart6VarInit,
+        Uart6VarTimeOut},
+#endif
+
+    //uart port none
+    {   _UART_PORT_NONE,
+        {115200, USART_WordLength_8b, USART_StopBits_1, USART_Parity_No, (USART_Mode_Rx|USART_Mode_Tx), USART_HardwareFlowControl_None},
+        FALSE,
+        NULL,
+        NULL,
+        NULL,
+        NULL}
+};
+
+const stCecDeclare_t stProjectCecWorkTable[] =
+{
+    //cec none
+    {NULL,                                                          {eCecSrcDisType_Src, FALSE, 0, 0x00}}
+};
+
+#if _ENABLE_NEW_USER_KEY_DEFINE_FUNCTION
+const stNewKeyDeclare_t stProjectNewKeyTable[] =
+{
+//    pstNewKeyPort    u8KeyGroup       u32KeyValue     eNewKeyOnLevel      bIsDipKey
+    //emKeyName_S1 = 0,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS1],          0,  BIT0,   ePinLevel_High,  FALSE},
+    //emKeyName_S2,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS2],          0,  BIT1,   ePinLevel_High,  FALSE},
+    //emKeyName_S3,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS3],          0,  BIT2,   ePinLevel_High,  FALSE},
+    //emKeyName_S4,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS4],          0,  BIT3,   ePinLevel_High,  FALSE},
+    //emKeyName_S5,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS5],          0,  BIT4,   ePinLevel_High,  FALSE},
+    //emKeyName_S6,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS6],          0,  BIT5,   ePinLevel_High,  FALSE},
+    //emKeyName_S7,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS7],          0,  BIT6,   ePinLevel_High,  FALSE},
+    //emKeyName_S8,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS8],          0,  BIT7,   ePinLevel_High,  FALSE},
+    //emKeyName_S9,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS9],          0,  BIT8,   ePinLevel_High,  FALSE},
+    //emKeyName_S10,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS10],         0,  BIT9,   ePinLevel_High,  FALSE},
+    //emKeyName_S11,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS11],         0, BIT10,   ePinLevel_High,  FALSE},
+    //emKeyName_S12,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS12],         0, BIT11,   ePinLevel_High,  FALSE},
+    //emKeyName_S13,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS13],         0, BIT12,   ePinLevel_High,  FALSE},
+    //emKeyName_S14,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS14],         0, BIT13,   ePinLevel_High,  FALSE},
+    //emKeyName_S15,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS15],         0, BIT14,   ePinLevel_High,  FALSE},
+    //emKeyName_S16,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS16],         0, BIT15,   ePinLevel_High,  FALSE},
+    //emKeyName_S17,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS17],         0, BIT16,   ePinLevel_High,  FALSE},
+    //emKeyName_S18,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS18],         0, BIT17,   ePinLevel_High,  FALSE},
+    //emKeyName_S19,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS19],         0, BIT18,   ePinLevel_High,  FALSE},
+    //emKeyName_S20,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS20],         1,  BIT0,   ePinLevel_High,  FALSE},
+    //emKeyName_S21,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS21],         1,  BIT1,   ePinLevel_High,  FALSE},
+    //emKeyName_S22,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS22],         1,  BIT2,   ePinLevel_High,  FALSE},
+    //emKeyName_S23,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS23],         1,  BIT3,   ePinLevel_High,  FALSE},
+    //emKeyName_S24,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS24],         1,  BIT4,   ePinLevel_High,  FALSE},
+    //emKeyName_S25,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS25],         1,  BIT5,   ePinLevel_High,  FALSE},
+    //emKeyName_S26,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS26],         1,  BIT6,   ePinLevel_High,  FALSE},
+    //emKeyName_S27,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS27],         1,  BIT7,   ePinLevel_High,  FALSE},
+    //emKeyName_S28,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS28],         1,  BIT8,   ePinLevel_High,  FALSE},
+    //emKeyName_S29,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS29],         1,  BIT9,   ePinLevel_High,  FALSE},
+    //emKeyName_S30,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS30],         1, BIT10,   ePinLevel_High,  FALSE},
+    //emKeyName_S31,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS31],         1, BIT11,   ePinLevel_High,  FALSE},
+    //emKeyName_S32,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS32],         1, BIT12,   ePinLevel_High,  FALSE},
+    //emKeyName_S33,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS33],         1, BIT13,   ePinLevel_High,  FALSE},
+    //emKeyName_S34,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS34],         1, BIT14,   ePinLevel_High,  FALSE},
+    //emKeyName_S35,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS35],         1, BIT15,   ePinLevel_High,  FALSE},
+    //emKeyName_S36,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS36],         1, BIT16,   ePinLevel_High,  FALSE},
+    //emKeyName_S37,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS37],         1, BIT17,   ePinLevel_High,  FALSE},
+    //emKeyName_S38,
+    {(pstGpioConfig_t)&stProjectGpioTable[eGpioName_KeyS38],         1, BIT18,   ePinLevel_High,  FALSE},
+
+    //end
+    {(pstGpioConfig_t)NULL,                                         0,  BIT0,    ePinLevel_Low,  FALSE},// the last one
+};
+#endif
+
+const stI2CSwitchCtrl_t stProjectI2cSwitchTable[] =
+{
+    // switch null
+    {NULL, NULL},
+};
+#if _EN_CHIP_ADN4604_USE
+const stDrvADN4604VarConfig stProjectAdn4604Config[] =
+{
+    {ADN4604_DEV_ADDR_1,_I2C_TABLE_INDEX_ADN4604_1},
+    {0,_I2C_TABLE_INDEX_ADN4604_1}
+};
+#endif
+
+
+

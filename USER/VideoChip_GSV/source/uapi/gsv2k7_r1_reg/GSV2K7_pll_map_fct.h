@@ -1,0 +1,22 @@
+#ifndef GSV2K7_PLL_MAP_FCT_H
+#define GSV2K7_PLL_MAP_FCT_H
+#define GSV2K7_PLL_get_TXB_HDMI2_MODE_AUTO(port, pval)                AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0x02, 0x2, 0x1, pval)
+#define GSV2K7_PLL_get_RB_RXA_PLL_SER_DIV(port, pval)                 AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0x2F, 0x7, 0, pval)
+#define GSV2K7_PLL_get_RB_RXA_PLL_REF_PRE_DIV_FREQ(port, pval)        AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0x33, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_RXA_PLL_VCO_POST_DIV_FREQ(port, pval)       AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0x36, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_RXA_PLL_VCO_FREQ(port, pval)                AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0x39, 0xF, 0xFF, 0, 2, pval)
+#define GSV2K7_PLL_get_RB_RXB_PLL_SER_DIV(port, pval)                 AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0x5F, 0x7, 0, pval)
+#define GSV2K7_PLL_get_RB_RXB_PLL_REF_PRE_DIV_FREQ(port, pval)        AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0x63, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_RXB_PLL_VCO_POST_DIV_FREQ(port, pval)       AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0x66, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_RXB_PLL_VCO_FREQ(port, pval)                AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0x69, 0xF, 0xFF, 0, 2, pval)
+#define GSV2K7_PLL_set_TXB_PLL_LOCK_CLEAR(port, val)                  AvHalI2cWriteField8(GSV2K7_PLL_MAP_ADDR(port), 0xB6, 0x1, 0x0, val)
+#define GSV2K7_PLL_get_RB_TXB_PLL_LOCK(port, pval)                    AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0xBC, 0x80, 0x7, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_PRE_DIV(port, pval)                 AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0xBC, 0x1F, 0, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_POST_DIV(port, pval)                AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0xBD, 0x7, 0xFF, 0, 2, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_SER_DIV(port, pval)                 AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0xBF, 0x7, 0, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_REF_CLK_FREQ(port, pval)            AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0xC0, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_REF_PRE_DIV_FREQ(port, pval)        AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0xC3, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_VCO_POST_DIV_FREQ(port, pval)       AvHalI2cReadField32BE(GSV2K7_PLL_MAP_ADDR(port), 0xC6, 0x3, 0xFF, 0, 3, pval)
+#define GSV2K7_PLL_get_RB_TXB_PLL_LOCK_CAPTURED(port, pval)           AvHalI2cReadField8(GSV2K7_PLL_MAP_ADDR(port), 0xCB, 0x8, 0x3, pval)
+#define GSV2K7_PLL_set_VG_CLK_SRC_SEL(port, val)                      AvHalI2cWriteField8(GSV2K7_PLL_MAP_ADDR(port), 0xFA, 0x7, 0, val)
+#endif
